@@ -6,24 +6,26 @@ This script converts tar archives to RPM packages using FPM (Effing Package Mana
 
 The following tools must be installed on your system:
 - `jq` - For JSON processing
-- `fpm` - For package creation
+- `fpm` - For package creation (requires ruby)
 - `curl` - For downloading tar files
 - `rpmbuild` - For RPM package building
 
 ## Installation
 
+### Option 1: Manual Installation
+
 1. Ensure you have all the required dependencies installed:
 
 ```bash
 # For RHEL/CentOS/Fedora
-sudo yum install jq curl rpm-build
+sudo dnf install jq curl rpm-build
 
 # For Ubuntu/Debian
 sudo apt-get install jq curl rpm
 
 # Install Ruby (required for FPM)
 # For RHEL/CentOS/Fedora
-sudo yum install ruby ruby-devel
+sudo dnf install ruby ruby-devel
 
 # For Ubuntu/Debian
 sudo apt-get install ruby ruby-dev
@@ -36,6 +38,24 @@ sudo gem install fpm
 ```bash
 chmod +x tar_rpm.sh
 ```
+
+### Option 2: Using Docker
+
+1. Build the Docker image:
+```bash
+docker build -t tar-to-rpm .
+```
+
+2. Run the container:
+```bash
+# Using command line arguments
+docker run -v /path/to/output:/output tar-to-rpm -n <package_name> -v <version> -d <description> -p /output -l <tar_file_url>
+
+# Using JSON configuration
+docker run -v /path/to/output:/output -v /path/to/config.json:/app/config.json tar-to-rpm -j /app/config.json
+```
+
+Note: Replace `/path/to/output` with the directory where you want to store the generated RPM files.
 
 ## Usage
 

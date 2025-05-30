@@ -1,17 +1,35 @@
-# Use Fedora as the base image
-FROM fedora:latest
+# Use CentOS Stream as base image since it's commonly used for RPM builds
+FROM quay.io/centos/centos:stream9
 
-# Install tools needed to build RPMs
-RUN dnf install -y rpm-build gcc make
+# Install required dependencies
+RUN dnf update -y && \
+    dnf install -y \
+    jq \
+    rpm-build \
+    ruby \
+    ruby-devel \
+    gcc \
+    make \
+    && dnf clean all
 
-# Set a working directory
-WORKDIR /build
+# Install FPM
+RUN gem install fpm
 
-# Copy the source tarball and spec file into the container
-COPY myapp.tar.gz /build/
-COPY myapp.spec /build/
+# Create working directory
+WORKDIR /app
 
-# Build the RPM using the spec file
-RUN rpmbuild -ba myapp.spec
+# Copy the script and any other necessary files
+COPY bash/tar_to_rpm.sh /app/tar_to_rpm.sh 
+COPY bash/input.json /app/input.json
 
-# The RPM will be located in /root/rpmbuild/RPMS/<arch>/
+RUN chmod +x /app/tar_to_rpm.sh && \
+    chmod +x /app/input.json
+
+# Create a directory for output RPMs
+RUN mkdir -p /output
+
+# Set the entrypoint to the script
+ENTRYPOINT ["/app/tar_to_rpm.sh"]
+
+# Default command (can be overridden)
+CMD ["--help"]

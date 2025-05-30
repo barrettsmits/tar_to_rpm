@@ -2,6 +2,7 @@
 
 # Check for dependencies
 command -v jq >/dev/null 2>&1 || { echo "jq is required but not installed. Aborting."; exit 1; }
+command -v gem >/dev/null 2>&1 || { echo "gem is required but not installed. Aborting."; exit 1; }
 command -v fpm >/dev/null 2>&1 || { echo "fpm is required but not installed. Aborting."; exit 1; }
 command -v curl >/dev/null 2>&1 || { echo "curl is required but not installed. Aborting."; exit 1; }
 command -v rpmbuild >/dev/null 2>&1 || { echo "rpmbuild is required but not installed. Aborting."; exit 1; }
