@@ -41,10 +41,16 @@ if [ -z "$package_name" ] || [ -z "$version" ] || [ -z "$description" ] || [ -z 
     usage
 fi
 
+# Check if the path exists
+if [ ! -d "$path" ]; then
+    echo "Path does not exist. Creating it now..."
+    mkdir -p "$path"
+fi
+
 # Download the tar file to a temporary location
 temp_dir=$(mktemp -d)
 tar_file="$temp_dir/$(basename "$tar_link")"
-curl -o "$tar_file" "$tar_link" || { echo "Failed to download tar file."; exit 1; }
+curl -L -o "$tar_file" "$tar_link" || { echo "Failed to download tar file."; exit 1; }
 
 # Create the RPM using fpm
 rpm_file="$path/$package_name-$version.rpm"
