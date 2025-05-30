@@ -1,0 +1,7 @@
+{
+    "package_name": "myapp",
+    "version": "1.0",
+    "description": "My Application",
+    "path": "/output/path",
+    "tar_link": "https://example.com/myapp.tar.gz"
+}
