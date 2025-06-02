@@ -27,7 +27,8 @@ RUN chmod +x /app/tar_to_rpm.sh && \
 RUN mkdir -p /output && chmod 777 /output
 
 # Set the entrypoint to the script
-#ENTRYPOINT ["/app/tar_to_rpm.sh"]
+ENTRYPOINT ["/app/tar_to_rpm.sh"]
 
 # Default command (can be overridden)
-CMD ["/app/tar_to_rpm.sh","-j", "/app/input.json"]
+#CMD ["/app/tar_to_rpm.sh","-j", "/app/input.json"]
+CMD ["-j", "/app/input.json"]
