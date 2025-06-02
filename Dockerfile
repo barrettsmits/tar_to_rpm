@@ -8,9 +8,6 @@ RUN dnf update -y && \
     rpm-build \
     ruby \
     ruby-devel \
-    gcc \
-    make \
-    which\
     && dnf clean all
 
 # Install FPM
@@ -21,16 +18,16 @@ WORKDIR /app
 
 # Copy the script and any other necessary files
 COPY bash/tar_to_rpm.sh /app/tar_to_rpm.sh 
-COPY bash/input.json /app/input.json
+COPY ./input.json /app/input.json
 
 RUN chmod +x /app/tar_to_rpm.sh && \
     chmod 644 /app/input.json
 
 # Create a directory for output RPMs
-RUN mkdir -p /output
+RUN mkdir -p /output && chmod 777 /output
 
 # Set the entrypoint to the script
 #ENTRYPOINT ["/app/tar_to_rpm.sh"]
 
 # Default command (can be overridden)
-CMD ["-j /app/input.json"]
+CMD ["/app/tar_to_rpm.sh","-j", "/app/input.json"]

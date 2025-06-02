@@ -1,7 +1,0 @@
-{
-    "package_name": "drupalApp",
-    "version": "1.2",
-    "description": "Drupal Test Application",
-    "path": "/apps/drupal/package",
-    "tar_link": "https://github.com/drupal/drupal/archive/refs/tags/11.1.7.tar.gz"
-}
