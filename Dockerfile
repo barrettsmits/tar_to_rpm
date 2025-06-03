@@ -1,14 +1,15 @@
 # Use CentOS Stream as base image since it's commonly used for RPM builds
-FROM quay.io/centos/centos:stream9
+FROM ruby:3.3-slim
 
 # Install required dependencies (curl already installed)
-RUN dnf update -y && \
-    dnf install -y \
+RUN apt-get update -y && \
+    apt-get install -y \
+    build-essential \
+    curl \
+    git \
     jq \
-    rpm-build \
-    ruby \
-    ruby-devel \
-    && dnf clean all
+    rpm \
+    && apt-get clean all
 
 # Install FPM
 RUN gem install fpm

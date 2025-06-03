@@ -78,7 +78,6 @@ The script can be used in two ways:
 - `-n`: Package name
 - `-v`: Version number
 - `-d`: Package description
-- `-p`: Output path for the RPM file
 - `-l`: URL or path to the tar file
 - `-j`: Path to JSON configuration file
 
