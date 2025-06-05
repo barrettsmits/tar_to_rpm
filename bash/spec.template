@@ -10,7 +10,7 @@ BuildArch: noarch
 {{DESCRIPTION}}
 
 %prep
-%setup -q -n {{PACKAGE_NAME}}-{{VERSION}}
+%setup -q -n {{EXTRACT_DIR}}
 
 %build
 # No build step needed for simple extraction

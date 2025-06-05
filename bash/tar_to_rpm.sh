@@ -30,6 +30,7 @@ if [ -n "$json_file" ]; then
     version=$(jq -r '.version' "$json_file")
     description=$(jq -r '.description' "$json_file")
     tar_link=$(jq -r '.tar_link' "$json_file")
+    extract_dir=$(jq -r '.extract_dir // empty' "$json_file")
 fi
 
 # Check if all required variables are set
@@ -38,14 +39,37 @@ if [ -z "$package_name" ] || [ -z "$version" ] || [ -z "$description" ] || [ -z 
     usage
 fi
 
+# Extract NAME and VERSION from URL, fall back to JSON if needed
+if [[ "$tar_link" =~ ^https?://github\.com/[^/]+/([^/]+)/archive/refs/tags/([^/]+)\.tar\.gz$ ]]; then
+    NAME="${BASH_REMATCH[1]}"
+    VERSION="${BASH_REMATCH[2]}"
+elif [[ "$(basename "$tar_link")" =~ ^(.+)-([^-]+)\.tar\.gz$ ]]; then
+    NAME="${BASH_REMATCH[1]}"
+    VERSION="${BASH_REMATCH[2]}"
+else
+    NAME="$package_name"
+    VERSION="$version"
+fi
+
+# Set SOURCE to the exact tarball filename
+SOURCE=$(basename "$tar_link")
+
 # Download the tar file to a temporary location
 temp_dir=$(mktemp -d)
-tar_file="$temp_dir/$(basename "$tar_link")"
+tar_file="$temp_dir/$SOURCE"
 curl -L -o "$tar_file" "$tar_link" || { echo "Failed to download tar file."; exit 1; }
 
-NAME=$(echo "$tar_link" | sed 's|.*/\(.*\)/archive/.*|\1|')
-VERSION=$(echo "$tar_link" | sed 's|.*/refs/tags/\(.*\)\.tar\.gz|\1|')
-SOURCE="${VERSION}.tar.gz"
+# Determine the extraction directory
+if [ -n "$extract_dir" ]; then
+    EXTRACT_DIR="$extract_dir"
+else
+    top_dir=$(tar -tzf "$tar_file" | head -1 | cut -f1 -d'/')
+    if [ -n "$top_dir" ]; then
+        EXTRACT_DIR="$top_dir"
+    else
+        EXTRACT_DIR="${NAME}-${VERSION}"
+    fi
+fi
 
 # Set up rpmbuild environment
 RPMBUILD_DIR="$temp_dir/rpmbuild"
@@ -54,18 +78,17 @@ cp "$tar_file" "$RPMBUILD_DIR/SOURCES/"
 
 # Generate spec file from template
 SPEC_TEMPLATE="/app/spec.template"
-SPEC_FILE="$RPMBUILD_DIR/SPECS/$package_name.spec"
+SPEC_FILE="$RPMBUILD_DIR/SPECS/$NAME.spec"
 
 # Escape special characters
 description_escaped=$(printf '%s\n' "$description" | sed 's/[\/& \n]/\\&/g')
-tar_basename=$(basename "$tar_link")
 
 # Generate and verify spec file
 sed -e "s/{{PACKAGE_NAME}}/$NAME/g" \
     -e "s/{{VERSION}}/$VERSION/g" \
     -e "s/{{DESCRIPTION}}/$description_escaped/g" \
-    -e "s|{{TAR_LINK}}|$tar_basename|g" \
     -e "s|{{SOURCE_TAR}}|$SOURCE|g" \
+    -e "s/{{EXTRACT_DIR}}/$EXTRACT_DIR/g" \
     "$SPEC_TEMPLATE" > "$SPEC_FILE"
 if [ ! -s "$SPEC_FILE" ]; then
     echo "Error: Generated spec file is empty or missing."

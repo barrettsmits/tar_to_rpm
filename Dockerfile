@@ -1,5 +1,5 @@
-# Use CentOS Stream as base image
-FROM quay.io/centos/centos:stream9
+# Use Fedora Minimal as base image for a smaller footprint
+FROM fedora:latest
 
 # Install required dependencies
 RUN dnf update -y && \
@@ -35,10 +35,10 @@ RUN chmod +x /app/tar_to_rpm.sh && \
 # Create output directory
 RUN mkdir -p /output && chmod 777 /output
 
-# # Set the entrypoint to the script
+# Set the entrypoint to the script
 ENTRYPOINT ["/app/tar_to_rpm.sh"]
 
-# # Default command (can be overridden)
+# Default command (can be overridden)
 CMD ["-j", "/app/input.json"]
 
 # /app/tar_to_rpm.sh -j /app/input.json

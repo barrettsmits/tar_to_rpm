@@ -44,7 +44,10 @@ docker build -t tar-to-rpm .
 docker run -v /path/to/output:/output tar-to-rpm -n <package_name> -v <version> -d <description> -l <tar_file_url>
 
 # Using JSON configuration
-docker run -v /path/to/output:/output -v /path/to/config.json:/app/input.json tar-to-rpm -j /app/input.json
+docker run -v /path/to/output:/output -v /path/to/input.json:/app/input.json tar-to-rpm
+
+# OR
+docker run -t -v $pwd/output:/output tar-to-rpm
 ```
 
 Note: Replace `/path/to/output` with the directory where you want to store the generated RPM files.
